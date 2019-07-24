@@ -14,8 +14,9 @@ class ChooseCards extends Component {
       deck: null,
       colors: '',
       cards: [],
-      count: null,
-      pages: null,
+      totalCards: null,
+      page: 1,
+      pageSize: 175,
       query: {
         name: '',
         nameInclude: true,
@@ -45,7 +46,7 @@ class ChooseCards extends Component {
       }
       const colors = commanders.reduce((acc, c) => acc + c.color_identity.join('').toLowerCase(), '')
       const cardsRes = await getCards(`order=cmc&q=f%3A${res.data.deck.format}+game%3Apaper${res.data.deck.format.toLowerCase() === 'commander' ? `+id%3C%3D${colors || 'c'}` : ''}`)
-      this.setState({ deck: res.data.deck, cards: cardsRes.data.data, colors, loaded: true })
+      this.setState({ deck: res.data.deck, cards: cardsRes.data.data, totalCards: cardsRes.data.total_cards, colors, loaded: true })
     } catch (err) { this.setState({ err }) }
   }
 
@@ -66,7 +67,7 @@ class ChooseCards extends Component {
     q += query.colors.length > 0 ? `+${query.colorsAllAny}${query.colors.join('')}` : ''
     try {
       const cardsRes = await getCards(query.orderType + query.orderDir + q)
-      this.setState({ cards: cardsRes.data.data })
+      this.setState({ cards: cardsRes.data.data, page: 1, totalCards: cardsRes.data.total_cards })
     } catch (err) { this.setState({ err }) }
   }
 
@@ -93,7 +94,7 @@ class ChooseCards extends Component {
   }
 
   render () {
-    const { deck, cards, query, loaded, err } = this.state
+    const { deck, page, pageSize, totalCards, cards, query, loaded, err } = this.state
     const { match } = this.props
     if (err) {
       return (
@@ -103,23 +104,28 @@ class ChooseCards extends Component {
         </Fragment>
       )
     }
-    const cardsList = cards.map(card => {
-      const deckCard = deck.cards.find(c => c.card_id === card.id)
-      return (
-        <div key={card.id}>
-          {
-            deckCard
-              ? <DisplayCard card={card} buttonText={deckCard.is_commander ? '' : 'Remove from deck'} handleClick={this.removeCard} altId={deck.cards.find(c => c.card_id === card.id).id}/>
-              : <DisplayCard card={card} buttonText={deck.cards.length < 100 ? 'Add to deck' : ''} handleClick={this.addCard} />
-          }
-        </div>
-      )
-    })
+    const cardsList = (
+      <Fragment>
+        <div>{`Page ${page}: showing (${(page - 1) * pageSize + 1}----${(page - 1) * pageSize + cards.length}) of ${totalCards} cards`}</div>
+        {cards.map(card => {
+          const deckCard = deck.cards.find(c => c.card_id === card.id)
+          return (
+            <div key={card.id}>
+              {
+                deckCard
+                  ? <DisplayCard card={card} buttonText={deckCard.is_commander ? '' : 'Remove from deck'} handleClick={this.removeCard} altId={deck.cards.find(c => c.card_id === card.id).id}/>
+                  : <DisplayCard card={card} buttonText={deck.cards.length < 100 ? 'Add to deck' : ''} handleClick={this.addCard} />
+              }
+            </div>
+          )
+        })}
+      </Fragment>
+    )
     return (
       <Fragment>
         <Link to={`/decks/${match.params.id}`}><button>Back</button></Link>
         <SearchForm query={query} handleChange={this.handleChange} handleSubmit={this.handleSubmit} />
-        { cardsList.length > 0 ? cardsList : loaded ? <p>No cards to show</p> : <p>Loading cards...</p>}
+        { cards.length > 0 ? cardsList : loaded ? <p>No cards to show</p> : <p>Loading cards...</p>}
       </Fragment>
     )
   }

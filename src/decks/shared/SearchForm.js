@@ -109,7 +109,7 @@ const DisplayCard = ({ query, handleChange, handleSubmit }) => (
       <option value={'order=cmc'}>Cost</option>
       <option value={'order=name'}>Name</option>
       <option value={'order=usd'}>Price</option>
-    </select><br />
+    </select>
     <select
       name="orderDir"
       onChange={handleChange}
