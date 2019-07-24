@@ -1,6 +1,6 @@
 let apiUrl
 const apiUrls = {
-  production: 'https://aqueous-atoll-85096.herokuapp.com',
+  production: 'https://lit-gorge-98463.herokuapp.com',
   development: 'http://localhost:4741'
 }
 
@@ -9,5 +9,7 @@ if (window.location.hostname === 'localhost') {
 } else {
   apiUrl = apiUrls.production
 }
+
+export const mtgUrl = 'https://api.magicthegathering.io/v1'
 
 export default apiUrl

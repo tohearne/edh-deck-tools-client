@@ -9,6 +9,12 @@ import SignIn from './auth/components/SignIn'
 import SignOut from './auth/components/SignOut'
 import ChangePassword from './auth/components/ChangePassword'
 
+import Decks from './decks/components/Decks'
+import Deck from './decks/components/Deck'
+import CreateDeck from './decks/components/CreateDeck'
+import ChooseCommander from './decks/components/ChooseCommander'
+import ChooseCards from './decks/components/ChooseCards'
+
 import Alert from 'react-bootstrap/Alert'
 
 class App extends Component {
@@ -54,6 +60,21 @@ class App extends Component {
           )} />
           <AuthenticatedRoute user={user} path='/change-password' render={() => (
             <ChangePassword alert={this.alert} user={user} />
+          )} />
+          <Route exact path='/' render={() => (
+            <Decks />
+          )} />
+          <Route exact path='/decks/:id' render={() => (
+            <Deck user={user}/>
+          )} />
+          <AuthenticatedRoute user={user} path='/create-deck' render={() => (
+            <CreateDeck alert={this.alert} user={user} />
+          )} />
+          <AuthenticatedRoute user={user} path='/decks/:id/choose-commander' render={() => (
+            <ChooseCommander alert={this.alert} user={user} />
+          )} />
+          <AuthenticatedRoute user={user} path='/decks/:id/choose-cards' render={() => (
+            <ChooseCards alert={this.alert} user={user} />
           )} />
         </main>
       </React.Fragment>

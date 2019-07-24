@@ -1,37 +1,44 @@
-import React from 'react'
+import React, { Fragment } from 'react'
 import { Link } from 'react-router-dom'
 
 import './Header.scss'
 
 const authenticatedOptions = (
-  <React.Fragment>
+  <Fragment>
     <Link to="/change-password">Change Password</Link>
     <Link to="/sign-out">Sign Out</Link>
-  </React.Fragment>
+  </Fragment>
 )
 
 const unauthenticatedOptions = (
-  <React.Fragment>
+  <Fragment>
     <Link to="/sign-up">Sign Up</Link>
     <Link to="/sign-in">Sign In</Link>
-  </React.Fragment>
+  </Fragment>
 )
 
 const alwaysOptions = (
-  <React.Fragment>
+  <Fragment>
     <Link to="/">Home</Link>
-  </React.Fragment>
+  </Fragment>
+)
+
+const userOptions = (
+  <Link to="/create-deck"><button>New Deck</button></Link>
 )
 
 const Header = ({ user }) => (
-  <header className="main-header">
-    <h1>Uber, But For Taxis</h1>
-    <nav>
-      { user && <span>Welcome, {user.email}</span>}
-      { user ? authenticatedOptions : unauthenticatedOptions }
-      { alwaysOptions }
-    </nav>
-  </header>
+  <Fragment>
+    <header className="main-header">
+      <h1>EDH Deck Tools</h1>
+      <nav>
+        {user && <span>Welcome, {user.name}</span>}
+        {user ? authenticatedOptions : unauthenticatedOptions}
+      </nav>
+    </header>
+    {alwaysOptions}
+    {user ? userOptions : null}
+  </Fragment>
 )
 
 export default Header
