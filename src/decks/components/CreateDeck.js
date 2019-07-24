@@ -11,7 +11,7 @@ class CreateDeck extends Component {
 
     this.state = {
       title: '',
-      format: 'Commander',
+      format: 'commander',
       image: '',
       public: false,
       allFormats: [],

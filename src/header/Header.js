@@ -19,12 +19,15 @@ const unauthenticatedOptions = (
 
 const alwaysOptions = (
   <Fragment>
-    <Link to="/">Home</Link>
+    <Link to="/"><button>Home</button></Link>
   </Fragment>
 )
 
 const userOptions = (
-  <Link to="/create-deck"><button>New Deck</button></Link>
+  <Fragment>
+    <Link to="/create-deck"><button>New Deck</button></Link>
+    <Link to="/my-decks"><button>My Decks</button></Link>
+  </Fragment>
 )
 
 const Header = ({ user }) => (

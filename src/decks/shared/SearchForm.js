@@ -14,27 +14,11 @@ const DisplayCard = ({ query, handleChange, handleSubmit }) => (
       onChange={handleChange}
     />
     <select
-      name="nameExactAny"
+      name="nameInclude"
       onChange={handleChange}
     >
-      <option value={''}>Exact</option>
-      <option value={','}>All</option>
-      <option value={'|'}>Any</option>
-    </select><br />
-    <label htmlFor="supertypes">Supertypes</label>
-    <input
-      name="supertypes"
-      value={query.supertypes}
-      type="text"
-      placeholder="Supertypes"
-      onChange={handleChange}
-    />
-    <select
-      name="superAndOr"
-      onChange={handleChange}
-    >
-      <option value={','}>And</option>
-      <option value={'|'}>Or</option>
+      <option value={true}>Include</option>
+      <option value={false}>Exact</option>
     </select><br />
     <label htmlFor="types">Types</label>
     <input
@@ -45,26 +29,11 @@ const DisplayCard = ({ query, handleChange, handleSubmit }) => (
       onChange={handleChange}
     />
     <select
-      name="typesAndOr"
+      name="typesInclude"
       onChange={handleChange}
     >
-      <option value={','}>And</option>
-      <option value={'|'}>Or</option>
-    </select><br />
-    <label htmlFor="subtypes">Subtypes</label>
-    <input
-      name="subtypes"
-      value={query.subtypes}
-      type="text"
-      placeholder="Subtypes"
-      onChange={handleChange}
-    />
-    <select
-      name="subAndOr"
-      onChange={handleChange}
-    >
-      <option value={','}>And</option>
-      <option value={'|'}>Or</option>
+      <option value={true}>Include</option>
+      <option value={false}>Exclude</option>
     </select><br />
     <label htmlFor="text">Card Text</label>
     <input
@@ -75,46 +44,52 @@ const DisplayCard = ({ query, handleChange, handleSubmit }) => (
       onChange={handleChange}
     />
     <select
-      name="textExactAny"
+      name="textInclude"
       onChange={handleChange}
     >
-      <option value={''}>Exact</option>
-      <option value={','}>All</option>
-      <option value={'|'}>Any</option>
+      <option value={true}>Include</option>
+      <option value={false}>Exclude</option>
     </select><br />
     <label htmlFor="colors:">Colors</label><br />
     <label htmlFor="white">White</label>
     <input
       name="colors"
-      value='W'
+      value='w'
       type="checkbox"
       onChange={handleChange}
     />
     <label htmlFor="blue">Blue</label>
     <input
       name="colors"
-      value='U'
+      value='u'
       type="checkbox"
       onChange={handleChange}
     />
     <label htmlFor="black">Black</label>
     <input
       name="colors"
-      value='B'
+      value='b'
       type="checkbox"
       onChange={handleChange}
     />
     <label htmlFor="red">Red</label>
     <input
       name="colors"
-      value='R'
+      value='r'
       type="checkbox"
       onChange={handleChange}
     />
     <label htmlFor="green">Green</label>
     <input
       name="colors"
-      value='G'
+      value='g'
+      type="checkbox"
+      onChange={handleChange}
+    />
+    <label htmlFor="colorless">Colorless</label>
+    <input
+      name="colors"
+      value='c'
       type="checkbox"
       onChange={handleChange}
     />
@@ -122,8 +97,25 @@ const DisplayCard = ({ query, handleChange, handleSubmit }) => (
       name="colorsAllAny"
       onChange={handleChange}
     >
-      <option value={','}>All</option>
-      <option value={'|'}>Any</option>
+      <option value={'id%3C%3D'}>Include</option>
+      <option value={'id!%3D'}>Exclude</option>
+      <option value={'id%3D'}>Exact</option>
+    </select><br />
+    <label htmlFor="order">Order</label>
+    <select
+      name="orderType"
+      onChange={handleChange}
+    >
+      <option value={'order=cmc'}>Cost</option>
+      <option value={'order=name'}>Name</option>
+      <option value={'order=usd'}>Price</option>
+    </select><br />
+    <select
+      name="orderDir"
+      onChange={handleChange}
+    >
+      <option value={'&dir=asc'}>Ascending</option>
+      <option value={'&dir=desc'}>Descending</option>
     </select><br />
     <button type="submit">Search</button>
   </form>

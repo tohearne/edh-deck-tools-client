@@ -2,7 +2,7 @@
 import React, { Component, Fragment } from 'react'
 import { Link, withRouter } from 'react-router-dom'
 
-import { getCards, getDeck, createCard, deleteCard } from '../api'
+import { getCard, getCards, getDeck, createCard, deleteCard } from '../api'
 import SearchForm from '../shared/SearchForm'
 import DisplayCard from '../shared/DisplayCard'
 
@@ -12,22 +12,21 @@ class ChooseCards extends Component {
 
     this.state = {
       deck: null,
+      colors: '',
       cards: [],
       count: null,
       pages: null,
       query: {
         name: '',
-        nameExactAny: '',
-        supertypes: '',
-        superAndOr: ',',
+        nameInclude: true,
         types: '',
-        typesAndOr: ',',
-        subtypes: '',
-        subAndOr: ',',
+        typesInclude: true,
         text: '',
+        textInclude: true,
         colors: [],
-        colorsAllAny: ',',
-        textExactAny: ''
+        colorsAllAny: 'id%3C%3D',
+        orderType: 'order=cmc',
+        orderDir: '&dir=asc'
       },
       loaded: false,
       err: null
@@ -37,8 +36,16 @@ class ChooseCards extends Component {
   async componentDidMount () {
     try {
       const res = await getDeck(this.props.match.params.id)
-      const cards = await getCards({ legalities: { format: 'Commander', legality: 'Legal|Restricted' } })
-      this.setState({ deck: res.data.deck, cards, loaded: true })
+      const commanders = []
+      for (let i = 0; i < res.data.deck.cards.length; i++) {
+        if (res.data.deck.cards[i].is_commander) {
+          const c = await getCard(res.data.deck.cards[i].card_id)
+          commanders.push(c.data)
+        }
+      }
+      const colors = commanders.reduce((acc, c) => acc + c.color_identity.join('').toLowerCase(), '')
+      const cardsRes = await getCards(`order=cmc&q=f%3A${res.data.deck.format}+game%3Apaper${res.data.deck.format.toLowerCase() === 'commander' ? `+id%3C%3D${colors || 'c'}` : ''}`)
+      this.setState({ deck: res.data.deck, cards: cardsRes.data.data, colors, loaded: true })
     } catch (err) { this.setState({ err }) }
   }
 
@@ -51,16 +58,15 @@ class ChooseCards extends Component {
 
   handleSubmit = async event => {
     event.preventDefault()
-    const { query } = this.state
-    const name = query.nameExactAny ? query.name.replace(/[\s,]+/g, query.nameExactAny).replace(/(^|[,|]+)($|[,|]+)/mg, '') : query.name
-    const supertypes = query.supertypes.replace(/[\s,]+/g, query.superAndOr).replace(/(^|[,|]+)($|[,|]+)/mg, '').toLowerCase()
-    const types = query.types.replace(/[\s,]+/g, query.typesAndOr).replace(/(^|[,|]+)($|[,|]+)/mg, '').toLowerCase()
-    const subtypes = query.subtypes.replace(/[\s,]+/g, query.subAndOr).replace(/(^|[,|]+)($|[,|]+)/mg, '').toLowerCase()
-    const text = query.textExactAny ? query.text.replace(/[\s,]+/g, query.textExactAny).replace(/(^|[,|]+)($|[,|]+)/mg, '') : query.text
-    const colorIdentity = query.colors.join(query.colorsAllAny)
+    const { deck, colors, query } = this.state
+    let q = `&q=f%3A${deck.format}+game%3Apaper${deck.format.toLowerCase() === 'commander' ? `+id%3C%3D${colors || 'c'}` : ''}`
+    q += query.name ? `+${query.nameInclude ? '' : '!'}${encodeURIComponent(`"${query.name}"`).replace(/%20/g, '+')}` : ''
+    q += query.types ? query.types.split(' ').reduce((acc, t) => acc + `+${query.typesInclude ? '' : '-'}t%3A${encodeURIComponent(t)}`, '') : ''
+    q += query.text ? `+${query.textInclude ? '' : '-'}o%3A${encodeURIComponent(`"${query.text}"`).replace(/%20/g, '+')}` : ''
+    q += query.colors.length > 0 ? `+${query.colorsAllAny}${query.colors.join('')}` : ''
     try {
-      const resCards = await getCards({ name, supertypes, types, subtypes, text, colorIdentity, legalities: { format: 'Commander', legality: 'Legal|Restricted' } })
-      this.setState({ cards: resCards })
+      const cardsRes = await getCards(query.orderType + query.orderDir + q)
+      this.setState({ cards: cardsRes.data.data })
     } catch (err) { this.setState({ err }) }
   }
 
@@ -72,7 +78,6 @@ class ChooseCards extends Component {
       this.props.alert('Card added!', 'success')
       const res = await getDeck(this.props.match.params.id)
       this.setState({ deck: res.data.deck, loaded: true })
-      // this.props.history.push(`/decks/${this.props.match.params.id}`)
     } catch (err) { this.setState({ err }) }
   }
 
@@ -84,32 +89,37 @@ class ChooseCards extends Component {
       this.props.alert('Card removed!', 'success')
       const res = await getDeck(this.props.match.params.id)
       this.setState({ deck: res.data.deck, loaded: true })
-      // this.props.history.push(`/decks/${this.props.match.params.id}`)
     } catch (err) { this.setState({ err }) }
   }
 
   render () {
-    const { deck, cards, query, loaded } = this.state
+    const { deck, cards, query, loaded, err } = this.state
     const { match } = this.props
-    const cardsList = loaded
-      ? cards.map(card => {
-        const deckCard = deck.cards.find(c => c.card_id === card.id)
-        return (
-          <div key={card.id}>
-            {
-              deckCard
-                ? <DisplayCard card={card} buttonText={deckCard.is_commander ? '' : 'Remove from deck'} handleClick={this.removeCard} altId={deck.cards.find(c => c.card_id === card.id).id}/>
-                : <DisplayCard card={card} buttonText={deck.cards.length < 100 ? 'Add to deck' : ''} handleClick={this.addCard} />
-            }
-          </div>
-        )
-      })
-      : <p>Loading cards...</p>
+    if (err) {
+      return (
+        <Fragment>
+          <h3>{err}</h3>
+          <Link to={`/decks/${match.params.id}`}><button>Back</button></Link>
+        </Fragment>
+      )
+    }
+    const cardsList = cards.map(card => {
+      const deckCard = deck.cards.find(c => c.card_id === card.id)
+      return (
+        <div key={card.id}>
+          {
+            deckCard
+              ? <DisplayCard card={card} buttonText={deckCard.is_commander ? '' : 'Remove from deck'} handleClick={this.removeCard} altId={deck.cards.find(c => c.card_id === card.id).id}/>
+              : <DisplayCard card={card} buttonText={deck.cards.length < 100 ? 'Add to deck' : ''} handleClick={this.addCard} />
+          }
+        </div>
+      )
+    })
     return (
       <Fragment>
         <Link to={`/decks/${match.params.id}`}><button>Back</button></Link>
         <SearchForm query={query} handleChange={this.handleChange} handleSubmit={this.handleSubmit} />
-        { cardsList.length === undefined || cardsList.length > 0 ? cardsList : <p>No cards to show</p>}
+        { cardsList.length > 0 ? cardsList : loaded ? <p>No cards to show</p> : <p>Loading cards...</p>}
       </Fragment>
     )
   }

@@ -1,16 +1,18 @@
 'use strict'
 import apiUrl, { mtgUrl } from '../apiConfig'
 import axios from 'axios'
-const mtg = require('mtgsdk')
 
 export const getCards = (params) => {
-  return mtg.card.where(params)
-}
-
-export const getFormats = () => {
   return axios({
     method: 'GET',
-    url: mtgUrl + '/formats'
+    url: mtgUrl + '/cards/search?' + params
+  })
+}
+
+export const getCard = (id) => {
+  return axios({
+    method: 'GET',
+    url: mtgUrl + '/cards/' + id
   })
 }
 
@@ -39,10 +41,30 @@ export const getDecks = () => {
   })
 }
 
+export const getMyDecks = (user) => {
+  return axios({
+    method: 'GET',
+    url: apiUrl + '/my-decks',
+    headers: {
+      'Authorization': `Token token=${user.token}`
+    }
+  })
+}
+
 export const getDeck = (id) => {
   return axios({
     method: 'GET',
     url: apiUrl + '/decks/' + id
+  })
+}
+
+export const deleteDeck = (id, user) => {
+  return axios({
+    method: 'DELETE',
+    url: apiUrl + '/decks/' + id,
+    headers: {
+      'Authorization': `Token token=${user.token}`
+    }
   })
 }
 

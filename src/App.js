@@ -11,6 +11,7 @@ import ChangePassword from './auth/components/ChangePassword'
 
 import Decks from './decks/components/Decks'
 import Deck from './decks/components/Deck'
+import MyDecks from './decks/components/MyDecks'
 import CreateDeck from './decks/components/CreateDeck'
 import ChooseCommander from './decks/components/ChooseCommander'
 import ChooseCards from './decks/components/ChooseCards'
@@ -64,8 +65,11 @@ class App extends Component {
           <Route exact path='/' render={() => (
             <Decks />
           )} />
+          <AuthenticatedRoute user={user} exact path='/my-decks' render={() => (
+            <MyDecks user={user} />
+          )} />
           <Route exact path='/decks/:id' render={() => (
-            <Deck user={user}/>
+            <Deck alert={this.alert} user={user} />
           )} />
           <AuthenticatedRoute user={user} path='/create-deck' render={() => (
             <CreateDeck alert={this.alert} user={user} />

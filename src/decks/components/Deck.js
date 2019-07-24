@@ -2,7 +2,7 @@
 import React, { Component, Fragment } from 'react'
 import { Link, withRouter } from 'react-router-dom'
 
-import { getCards, getDeck } from '../api'
+import { getCard, getDeck, deleteDeck } from '../api'
 import DisplayCard from '../shared/DisplayCard'
 
 class Deck extends Component {
@@ -18,25 +18,28 @@ class Deck extends Component {
     }
   }
 
+  findCards = async myCards => {
+    if (myCards.length < 1) return
+    const res = await getCard(myCards[0].card_id)
+    if (myCards[0].is_commander) await this.setState({ commanders: [...this.state.commanders, res.data] })
+    else await this.setState({ cards: [...this.state.cards, res.data] })
+    const cards = [...myCards]
+    return setTimeout(() => this.findCards(cards.splice(1)), 100)
+  }
+
   async componentDidMount () {
     try {
       const res = await getDeck(this.props.match.params.id)
-      const commanders = []
-      let cards = []
-      if (res.data.deck.cards.length > 0) {
-        const cardIds = res.data.deck.cards.reduce((acc, curr, i) => {
-          return acc + (i > 0 ? '|' : '') + curr.card_id
-        }, '')
-        cards = await getCards({ id: cardIds })
-        if (res.data.deck.format === 'Commander') {
-          const commanderIds = res.data.deck.cards.filter(card => card.is_commander).map(card => card.card_id)
-          cards = cards.filter(card => {
-            if (commanderIds.includes(card.id)) commanders.push(card)
-            else return true
-          })
-        }
-      }
-      this.setState({ deck: res.data.deck, commanders, cards, loaded: true })
+      await this.findCards(res.data.deck.cards)
+      this.setState({ deck: res.data.deck, loaded: true })
+    } catch (err) { this.setState({ err }) }
+  }
+
+  destroyDeck = async (event) => {
+    try {
+      await deleteDeck(this.props.match.params.id, this.props.user)
+      this.props.alert('Deck Deleted!', 'success')
+      this.props.history.push('/')
     } catch (err) { this.setState({ err }) }
   }
 
@@ -67,13 +70,9 @@ class Deck extends Component {
           {user && user.id === deck.user.id ? <Link to={`${match.url}/choose-commander`}>Choose your commander</Link> : <p>No commander chosen</p>}
         </div>
       )
-    const cardsList = cards.map(card => (
-      <Fragment key={card.id}>
-        <img src={card.imageUrl} alt={card.name}/>
-      </Fragment>
-    ))
+    const cardsList = cards.map(card => <DisplayCard key={card.id} card={card} />)
     const addCards = user && user.id === deck.user.id
-      ? deck.format === 'Commander'
+      ? deck.format === 'commander'
         ? deck.cards.length < 100 && commanders.length > 0
           ? (
             <Fragment>
@@ -91,7 +90,8 @@ class Deck extends Component {
     return (
       <Fragment>
         <h1>{deck.title}</h1>
-        {commandersList}
+        {user && user.id === deck.user.id ? <button onClick={this.destroyDeck}>Delete Deck</button> : null}
+        {deck.format.toLowerCase() === 'commander' ? commandersList : ''}
         { cardsList.length > 0 ? cardsList : <p>No cards to show</p>}
         {addCards}
       </Fragment>

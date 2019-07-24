@@ -10,6 +10,7 @@ if (window.location.hostname === 'localhost') {
   apiUrl = apiUrls.production
 }
 
-export const mtgUrl = 'https://api.magicthegathering.io/v1'
+// export const mtgUrl = 'https://api.magicthegathering.io/v1'
+export const mtgUrl = 'https://api.scryfall.com'
 
 export default apiUrl

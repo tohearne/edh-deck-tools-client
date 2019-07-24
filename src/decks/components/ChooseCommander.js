@@ -17,17 +17,15 @@ class ChooseCommander extends Component {
       pages: null,
       query: {
         name: '',
-        nameExactAny: '',
-        supertypes: '',
-        superAndOr: ',',
+        nameInclude: true,
         types: '',
-        typesAndOr: ',',
-        subtypes: '',
-        subAndOr: ',',
+        typesInclude: true,
         text: '',
+        textInclude: true,
         colors: [],
-        colorsAllAny: ',',
-        textExactAny: ''
+        colorsAllAny: 'id%3C%3D',
+        orderType: 'order=cmc',
+        orderDir: '&dir=asc'
       },
       loaded: false,
       err: null
@@ -37,8 +35,8 @@ class ChooseCommander extends Component {
   async componentDidMount () {
     try {
       const res = await getDeck(this.props.match.params.id)
-      const cards = await getCards({ supertypes: 'legendary', types: 'creature', legalities: { format: 'Commander', legality: 'Legal|Restricted' } })
-      this.setState({ deck: res.data.deck, cards, loaded: true })
+      const cardsRes = await getCards(`order=cmc&q=f%3A${res.data.deck.format}+game%3Apaper+is%3Acommander`)
+      this.setState({ deck: res.data.deck, cards: cardsRes.data.data, loaded: true })
     } catch (err) { this.setState({ err }) }
   }
 
@@ -51,18 +49,15 @@ class ChooseCommander extends Component {
 
   handleSubmit = async event => {
     event.preventDefault()
-    const { query } = this.state
-    const name = query.nameExactAny ? query.name.replace(/[\s,]+/g, query.nameExactAny).replace(/(^|[,|]+)($|[,|]+)/mg, '') : query.name
-    let supertypes = query.supertypes.replace(/legendary/ig, '').replace(/[\s,]+/g, query.superAndOr).replace(/(^|[,|]+)($|[,|]+)/mg, '').toLowerCase()
-    supertypes += supertypes ? ',legendary' : 'legendary'
-    let types = query.types.replace(/creature/ig, '').replace(/[\s,]+/g, query.typesAndOr).replace(/(^|[,|]+)($|[,|]+)/mg, '').toLowerCase()
-    types += types ? ',creature' : 'creature'
-    const subtypes = query.subtypes.replace(/[\s,]+/g, query.subAndOr).replace(/(^|[,|]+)($|[,|]+)/mg, '').toLowerCase()
-    const text = query.textExactAny ? query.text.replace(/[\s,]+/g, query.textExactAny).replace(/(^|[,|]+)($|[,|]+)/mg, '') : query.text
-    const colorIdentity = query.colors.join(query.colorsAllAny)
+    const { deck, query } = this.state
+    let q = `&q=f%3A${deck.format}+game%3Apaper+is%3Acommander`
+    q += query.name ? `+${query.nameInclude ? '' : '!'}${encodeURIComponent(`"${query.name}"`).replace(/%20/g, '+')}` : ''
+    q += query.types ? query.types.split(' ').reduce((acc, t) => acc + `+${query.typesInclude ? '' : '-'}t%3A${encodeURIComponent(t)}`, '') : ''
+    q += query.text ? `+${query.textInclude ? '' : '-'}o%3A${encodeURIComponent(`"${query.text}"`).replace(/%20/g, '+')}` : ''
+    q += query.colors.length > 0 ? `+${query.colorsAllAny}${query.colors.join('')}` : ''
     try {
-      const resCards = await getCards({ name, supertypes, types, subtypes, text, colorIdentity, legalities: { format: 'Commander', legality: 'Legal|Restricted' } })
-      this.setState({ cards: resCards })
+      const cardsRes = await getCards(query.orderType + query.orderDir + q)
+      this.setState({ cards: cardsRes.data.data })
     } catch (err) { this.setState({ err }) }
   }
 
@@ -76,22 +71,27 @@ class ChooseCommander extends Component {
   }
 
   render () {
-    const { deck, cards, query, loaded } = this.state
+    const { deck, cards, query, loaded, err } = this.state
     const { match } = this.props
-    const cardsList = cards.map(card => loaded
-      ? (
-        <div key={card.id}>
-          <DisplayCard card={card} buttonText='Add to deck' handleClick={this.addCard} />
-        </div>
+    if (err) {
+      return (
+        <Fragment>
+          <h3>{err}</h3>
+          <Link to={`/decks/${match.params.id}`}><button>Back</button></Link>
+        </Fragment>
       )
-      : <p>Loading cards...</p>
-    )
+    }
+    const cardsList = cards.map(card => (
+      <div key={card.id}>
+        <DisplayCard card={card} buttonText='Add commander' handleClick={this.addCard} />
+      </div>
+    ))
     return (
       <Fragment>
-        <h1>{deck.name}</h1>
+        <h1>{deck ? deck.title : null}</h1>
         <Link to={`/decks/${match.params.id}`}><button>Back</button></Link>
         <SearchForm query={query} handleChange={this.handleChange} handleSubmit={this.handleSubmit} />
-        { cardsList.length > 0 ? cardsList : <p>No cards to show</p>}
+        { cardsList.length > 0 ? cardsList : loaded ? <p>No cards to show</p> : <p>Loading cards...</p>}
       </Fragment>
     )
   }
