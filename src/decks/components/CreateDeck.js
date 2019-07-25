@@ -31,15 +31,16 @@ class CreateDeck extends Component {
     [event.target.name]: event.target.value
   })
 
-  onCreateDeck = event => {
+  onCreateDeck = async event => {
     event.preventDefault()
     const { alert, history, user } = this.props
-    createDeck(this.state, user)
-      .then(() => history.push('/'))
-      .catch(err => {
-        this.setState({ title: '', format: '', public: false, err })
-        alert('Failed to create Deck', 'danger')
-      })
+    try {
+      const res = await createDeck(this.state, user)
+      history.push('/decks/' + res.data.deck.id)
+    } catch (err) {
+      this.setState({ title: '', format: '', public: false, err })
+      alert('Failed to create Deck', 'danger')
+    }
   }
 
   render () {

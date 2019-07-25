@@ -47,8 +47,8 @@ const DisplayCard = ({ query, handleChange, handleSubmit }) => (
       name="textInclude"
       onChange={handleChange}
     >
-      <option value='+'>Include</option>
-      <option value='+-'>Exact</option>
+      <option value='+'>Includes</option>
+      <option value='+-'>Excludes</option>
     </select><br />
     <label htmlFor="colors:">Colors</label><br />
     <label htmlFor="white">White</label>
@@ -97,8 +97,7 @@ const DisplayCard = ({ query, handleChange, handleSubmit }) => (
       name="colorsAllAny"
       onChange={handleChange}
     >
-      <option value={'id%3C%3D'}>Include</option>
-      <option value={'id!%3D'}>Exclude</option>
+      <option value={'id%3C%3D'}>Any</option>
       <option value={'id%3D'}>Exact</option>
     </select><br />
     <label htmlFor="order">Order</label>
