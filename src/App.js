@@ -9,6 +9,15 @@ import SignIn from './auth/components/SignIn'
 import SignOut from './auth/components/SignOut'
 import ChangePassword from './auth/components/ChangePassword'
 
+import Decks from './decks/components/Decks'
+import Deck from './decks/components/Deck'
+import MyDecks from './decks/components/MyDecks'
+import CreateDeck from './decks/components/CreateDeck'
+import EditDeck from './decks/components/EditDeck'
+import ChooseCommander from './decks/components/ChooseCommander'
+import ChooseCards from './decks/components/ChooseCards'
+import ChooseLands from './decks/components/ChooseLands'
+
 import Alert from 'react-bootstrap/Alert'
 
 class App extends Component {
@@ -54,6 +63,30 @@ class App extends Component {
           )} />
           <AuthenticatedRoute user={user} path='/change-password' render={() => (
             <ChangePassword alert={this.alert} user={user} />
+          )} />
+          <Route exact path='/' render={() => (
+            <Decks />
+          )} />
+          <AuthenticatedRoute user={user} exact path='/my-decks' render={() => (
+            <MyDecks user={user} />
+          )} />
+          <Route exact path='/decks/:id' render={() => (
+            <Deck alert={this.alert} user={user} />
+          )} />
+          <AuthenticatedRoute user={user} path='/create-deck' render={() => (
+            <CreateDeck alert={this.alert} user={user} />
+          )} />
+          <AuthenticatedRoute user={user} path='/decks/:id/choose-commander' render={() => (
+            <ChooseCommander alert={this.alert} user={user} />
+          )} />
+          <AuthenticatedRoute user={user} path='/decks/:id/choose-cards' render={() => (
+            <ChooseCards alert={this.alert} user={user} />
+          )} />
+          <AuthenticatedRoute user={user} path='/decks/:id/edit' render={() => (
+            <EditDeck alert={this.alert} user={user} />
+          )} />
+          <AuthenticatedRoute user={user} path='/decks/:id/choose-lands' render={() => (
+            <ChooseLands alert={this.alert} user={user} />
           )} />
         </main>
       </React.Fragment>
