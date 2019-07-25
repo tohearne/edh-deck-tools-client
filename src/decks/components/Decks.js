@@ -1,6 +1,6 @@
 'use strict'
 import React, { Component, Fragment } from 'react'
-import { Link, withRouter } from 'react-router-dom'
+import { withRouter } from 'react-router-dom'
 
 import { getDecks } from '../api'
 import DeckPreviewImage from '../shared/DeckPreviewImage'
@@ -25,12 +25,10 @@ class Decks extends Component {
 
   render () {
     const { decks, loaded, err } = this.state
-    const { match } = this.props
     if (err) {
       return (
         <Fragment>
           <h3>{err.message}</h3>
-          <Link to={`/decks/${match.params.id}`}><button>Back</button></Link>
         </Fragment>
       )
     }

@@ -1,6 +1,6 @@
 'use strict'
-import React, { Component } from 'react'
-import { withRouter } from 'react-router-dom'
+import React, { Component, Fragment } from 'react'
+import { Link, withRouter } from 'react-router-dom'
 
 import { getMyDecks } from '../api'
 import DeckPreviewImage from '../shared/DeckPreviewImage'
@@ -24,7 +24,15 @@ class Decks extends Component {
   }
 
   render () {
-    const { decks, loaded } = this.state
+    const { decks, loaded, err } = this.state
+    if (err) {
+      return (
+        <Fragment>
+          <h3>{err.message}</h3>
+          <Link to={'/'}><button>Back</button></Link>
+        </Fragment>
+      )
+    }
     if (!loaded) return <p>Loading Decks...</p>
     const decksList = decks.map(deck => (
       <div key={deck.id} className='deck-prev-i'>

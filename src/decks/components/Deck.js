@@ -58,7 +58,7 @@ class Deck extends Component {
       return (
         <Fragment>
           <h3>{err.message}</h3>
-          <Link to={`/decks/${match.params.id}`}><button>Back</button></Link>
+          <Link to={'/'}><button>Back</button></Link>
         </Fragment>
       )
     }
