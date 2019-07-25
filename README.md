@@ -58,29 +58,23 @@ Wireframe / Entity Relationship Diagram
 
 ### Schema Definitions
 Table: users
-| Column   | Type
-|----------|------------------------
-| name     | `string :unique, null: false`
-| email    | `string :unique, null: false`
-| password | `string null: false`
-| token    | `string :unique, null: false`
+* name       `string :unique, null: false`
+* email      `string :unique, null: false`
+* password   `string null: false`
+* token      `string :unique, null: false`
 
 Table: decks `:belongs_to :user`
-| Column   | Type
-|----------|------------------------
-| title    | `text null: false`
-| format   | `text null: false`
-| image    | `text`
-| public   | `boolean null: false`
-| user_id  | `reference null: false`
+* title      `text null: false`
+* format     `text null: false`
+* image      `text`
+* public     `boolean null: false`
+* user_id    `reference null: false`
 
 Table: cards `:belongs_to :deck`
-| Column       | Type
-|--------------|------------------------
-| card_id      | `text null: false`
-| is_commander | `boolean null: false`
-| amount       | `integer null: false`
-| deck_id      | `reference null: false`
+* card_id        `text null: false`
+* is_commander   `boolean null: false`
+* amount         `integer null: false`
+* deck_id        `reference null: false`
 
 API Paths & Methods
 ------
