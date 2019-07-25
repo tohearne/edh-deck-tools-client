@@ -1,6 +1,6 @@
 'use strict'
 import React, { Component, Fragment } from 'react'
-import { withRouter } from 'react-router-dom'
+import { Link, withRouter } from 'react-router-dom'
 
 import { getDecks } from '../api'
 import DeckPreviewImage from '../shared/DeckPreviewImage'
@@ -24,15 +24,27 @@ class Decks extends Component {
   }
 
   render () {
-    const { decks, loaded } = this.state
-    if (!loaded) return <p>Loading...</p>
+    const { decks, loaded, err } = this.state
+    const { match } = this.props
+    if (err) {
+      return (
+        <Fragment>
+          <h3>{err.message}</h3>
+          <Link to={`/decks/${match.params.id}`}><button>Back</button></Link>
+        </Fragment>
+      )
+    }
+    if (!loaded) return <p>Loading Decks...</p>
     const decksList = decks.map(deck => (
-      <DeckPreviewImage key={deck.id} deck={deck} />
+      <div key={deck.id} className='deck-prev-i'>
+        <DeckPreviewImage deck={deck} />
+        <p>By: {deck.owner.name}</p>
+      </div>
     ))
     return (
-      <Fragment>
+      <div className='decks-list'>
         { decksList.length > 0 ? decksList : <p>No decks to show</p>}
-      </Fragment>
+      </div>
     )
   }
 }

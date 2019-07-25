@@ -1,6 +1,6 @@
 'use strict'
-import React, { Component } from 'react'
-import { withRouter } from 'react-router-dom'
+import React, { Component, Fragment } from 'react'
+import { Link, withRouter } from 'react-router-dom'
 
 // import { getFormats, createDeck } from '../api'
 import { createDeck } from '../api'
@@ -33,13 +33,10 @@ class CreateDeck extends Component {
 
   onCreateDeck = event => {
     event.preventDefault()
-
     const { alert, history, user } = this.props
-
     createDeck(this.state, user)
       .then(() => history.push('/'))
       .catch(err => {
-        console.error(err)
         this.setState({ title: '', format: '', public: false, err })
         alert('Failed to create Deck', 'danger')
       })
@@ -47,13 +44,18 @@ class CreateDeck extends Component {
 
   render () {
     // const { title, allFormats, loaded } = this.state
-    const { title } = this.state
-    // if (!loaded) return <p>Loading...</p>
-    // const formatOptions = allFormats.map((format, index) => (
-    //   <option key={index} value={format}>{format}</option>
-    // ))
+    const { title, err } = this.state
+    const { match } = this.props
+    if (err) {
+      return (
+        <Fragment>
+          <h3>{err.message}</h3>
+          <Link to={`/decks/${match.params.id}`}><button>Back</button></Link>
+        </Fragment>
+      )
+    }
     return (
-      <form className='auth-form' onSubmit={this.onCreateDeck}>
+      <form className='deck-form' onSubmit={this.onCreateDeck}>
         <h3>Create New Deck</h3>
         <label htmlFor="title">Title</label>
         <input
@@ -73,13 +75,13 @@ class CreateDeck extends Component {
         //   {formatOptions}
         // </select>
         }
-        <label htmlFor="public">Public?</label>
+        <label htmlFor="public">Type</label>
         <select
           name="public"
           onChange={this.handleChange}
         >
-          <option value={false}>No</option>
-          <option value={true}>Yes</option>
+          <option value={false}>Private</option>
+          <option value={true}>Public</option>
         </select>
         <button type="submit">Create Deck</button>
       </form>

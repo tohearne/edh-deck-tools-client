@@ -13,18 +13,26 @@ class Deck extends Component {
       deck: null,
       commanders: [],
       cards: [],
+      price: 0,
       loaded: false,
       err: null
     }
   }
 
+  wait = async (ms) => {
+    return new Promise(resolve => {
+      setTimeout(resolve, ms)
+    })
+  }
+
   findCards = async myCards => {
     if (myCards.length < 1) return
     const res = await getCard(myCards[0].card_id)
-    if (myCards[0].is_commander) await this.setState({ commanders: [...this.state.commanders, res.data] })
-    else await this.setState({ cards: [...this.state.cards, res.data] })
+    if (myCards[0].is_commander) await this.setState({ commanders: [...this.state.commanders, res.data], price: parseFloat((this.state.price + (res.data.prices.usd * myCards[0].amount)).toFixed(2)) })
+    else await this.setState({ cards: [...this.state.cards, res.data], price: parseFloat((this.state.price + (res.data.prices.usd * myCards[0].amount)).toFixed(2)) })
     const cards = [...myCards]
-    return setTimeout(() => this.findCards(cards.splice(1)), 100)
+    await this.wait(100)
+    return this.findCards(cards.splice(1))
   }
 
   async componentDidMount () {
@@ -44,8 +52,16 @@ class Deck extends Component {
   }
 
   render () {
-    const { deck, commanders, cards, loaded } = this.state
+    const { deck, commanders, cards, price, loaded, err } = this.state
     const { user, match } = this.props
+    if (err) {
+      return (
+        <Fragment>
+          <h3>{err.message}</h3>
+          <Link to={`/decks/${match.params.id}`}><button>Back</button></Link>
+        </Fragment>
+      )
+    }
     if (!loaded) return <p>Loading deck...</p>
     const commandersList = commanders.length > 0
       ? commanders.length > 1
@@ -67,32 +83,51 @@ class Deck extends Component {
         )
       : (
         <div className='commander'>
-          {user && user.id === deck.user.id ? <Link to={`${match.url}/choose-commander`}>Choose your commander</Link> : <p>No commander chosen</p>}
+          {user && user.id === deck.owner.id ? <Link to={`${match.url}/choose-commander`}>Choose your commander</Link> : <p>No commander chosen</p>}
         </div>
       )
-    const cardsList = cards.map(card => <DisplayCard key={card.id} card={card} />)
-    const addCards = user && user.id === deck.user.id
+    const cardsList = cards.map(card => {
+      const deckCard = deck.cards.find(c => c.card_id === card.id)
+      return (
+        <Fragment key={card.id}>
+          <DisplayCard card={card} other={deckCard.amount > 1 ? <p>x{deckCard.amount}</p> : null} />
+        </Fragment>
+      )
+    })
+    const addCards = user && user.id === deck.owner.id
       ? deck.format === 'commander'
-        ? deck.cards.length < 100 && commanders.length > 0
+        ? deck.card_count < 100 && commanders.length > 0
           ? (
             <Fragment>
               <Link to={`${match.url}/choose-cards`}><button>Add cards</button></Link>
-              <p>{100 - deck.cards.length} more required!</p>
+              <Link to={`${match.url}/choose-lands`}><button>Basic lands</button></Link>
+              <p>{100 - deck.card_count} more required!</p>
             </Fragment>
           ) : null
         : (
           <Fragment>
             <Link to={`${match.url}/choose-cards`}><button>Add cards</button></Link>
-            {deck.cards.length < 60 ? <p>{60 - deck.cards.length} more required!</p> : null}
+            <Link to={`${match.url}/choose-lands`}><button>Basic lands</button></Link>
+            {deck.card_count < 60 ? <p>{60 - deck.card_count} more required!</p> : null}
           </Fragment>
         )
       : null
     return (
       <Fragment>
         <h1>{deck.title}</h1>
-        {user && user.id === deck.user.id ? <button onClick={this.destroyDeck}>Delete Deck</button> : null}
+        <p>Total cost: ${price}</p>
+        {user && user.id === deck.owner.id ? (
+          <Fragment>
+            <Link to={`${match.url}/edit`}><button>Edit Deck</button></Link>
+            <button onClick={this.destroyDeck}>Delete Deck</button>
+          </Fragment>
+        )
+          : null}
         {deck.format.toLowerCase() === 'commander' ? commandersList : ''}
-        { cardsList.length > 0 ? cardsList : <p>No cards to show</p>}
+        <h4>Cards:</h4>
+        <div className='cards-list'>
+          { cardsList.length > 0 ? cardsList : <p>No cards to show</p>}
+        </div>
         {addCards}
       </Fragment>
     )

@@ -1,5 +1,5 @@
 'use strict'
-import React, { Component, Fragment } from 'react'
+import React, { Component } from 'react'
 import { withRouter } from 'react-router-dom'
 
 import { getMyDecks } from '../api'
@@ -25,14 +25,16 @@ class Decks extends Component {
 
   render () {
     const { decks, loaded } = this.state
-    if (!loaded) return <p>Loading...</p>
+    if (!loaded) return <p>Loading Decks...</p>
     const decksList = decks.map(deck => (
-      <DeckPreviewImage key={deck.id} deck={deck} />
+      <div key={deck.id} className='deck-prev-i'>
+        <DeckPreviewImage deck={deck} />
+      </div>
     ))
     return (
-      <Fragment>
+      <div className='decks-list'>
         { decksList.length > 0 ? decksList : <p>No decks to show</p>}
-      </Fragment>
+      </div>
     )
   }
 }

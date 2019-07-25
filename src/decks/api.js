@@ -58,6 +58,23 @@ export const getDeck = (id) => {
   })
 }
 
+export const patchDeck = (deck, user) => {
+  return axios({
+    method: 'PATCH',
+    url: apiUrl + '/decks/' + deck.id,
+    headers: {
+      'Authorization': `Token token=${user.token}`
+    },
+    data: {
+      deck: {
+        title: deck.title,
+        image: deck.image,
+        public: deck.public
+      }
+    }
+  })
+}
+
 export const deleteDeck = (id, user) => {
   return axios({
     method: 'DELETE',
@@ -68,7 +85,7 @@ export const deleteDeck = (id, user) => {
   })
 }
 
-export const createCard = (deckId, cardId, isCommander, user) => {
+export const createCard = (deckId, cardId, isCommander, amount, user) => {
   return axios({
     method: 'POST',
     url: apiUrl + '/cards',
@@ -79,18 +96,34 @@ export const createCard = (deckId, cardId, isCommander, user) => {
       card: {
         deck_id: deckId,
         card_id: cardId,
+        amount: amount,
         is_commander: isCommander
       }
     }
   })
 }
 
-export const deleteCard = (cardId, user) => {
+export const deleteCard = (id, user) => {
   return axios({
     method: 'DELETE',
-    url: apiUrl + '/cards/' + cardId,
+    url: apiUrl + '/cards/' + id,
     headers: {
       'Authorization': `Token token=${user.token}`
+    }
+  })
+}
+
+export const patchCard = (id, amount, user) => {
+  return axios({
+    method: 'PATCH',
+    url: apiUrl + '/cards/' + id,
+    headers: {
+      'Authorization': `Token token=${user.token}`
+    },
+    data: {
+      card: {
+        amount: amount
+      }
     }
   })
 }

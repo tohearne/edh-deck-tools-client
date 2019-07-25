@@ -17,8 +17,8 @@ const DisplayCard = ({ query, handleChange, handleSubmit }) => (
       name="nameInclude"
       onChange={handleChange}
     >
-      <option value={true}>Include</option>
-      <option value={false}>Exact</option>
+      <option value='+'>Include</option>
+      <option value='+!'>Exact</option>
     </select><br />
     <label htmlFor="types">Types</label>
     <input
@@ -32,8 +32,8 @@ const DisplayCard = ({ query, handleChange, handleSubmit }) => (
       name="typesInclude"
       onChange={handleChange}
     >
-      <option value={true}>Include</option>
-      <option value={false}>Exclude</option>
+      <option value='+'>and</option>
+      <option value='+or+'>or</option>
     </select><br />
     <label htmlFor="text">Card Text</label>
     <input
@@ -47,8 +47,8 @@ const DisplayCard = ({ query, handleChange, handleSubmit }) => (
       name="textInclude"
       onChange={handleChange}
     >
-      <option value={true}>Include</option>
-      <option value={false}>Exclude</option>
+      <option value='+'>Include</option>
+      <option value='+-'>Exact</option>
     </select><br />
     <label htmlFor="colors:">Colors</label><br />
     <label htmlFor="white">White</label>

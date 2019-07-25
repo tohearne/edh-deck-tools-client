@@ -7,3 +7,32 @@ body {
 .alert {
   margin: 30px;
 }
+
+.decks-list,
+.cards-list {
+  align-items: flex-start;
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: flex-start;
+  margin-top: 3rem auto 0 auto;
+}
+
+.deck-prev-i,
+.card-display-i {
+  background-color: grey;
+  border-radius: 3.7%;
+  margin: 1%;
+  min-width: 15rem;
+  padding: 1%;
+  width: 15vw;
+
+  button {
+    align-self: center;
+    display: flex;
+  }
+
+  img {
+    border-radius: 3.7%;
+    width: 100%;
+  }
+}
