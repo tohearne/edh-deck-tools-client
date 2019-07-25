@@ -57,15 +57,16 @@ Wireframe / Entity Relationship Diagram
 ![Wireframe/ERD](https://i.imgur.com/ijgSJC7.jpg)
 
 ### Schema Definitions
-
-| Table:   Users
+Table: users
+| Column   | Type
 |----------|------------------------
 | name     | `string :unique, null: false`
 | email    | `string :unique, null: false`
 | password | `string null: false`
 | token    | `string :unique, null: false`
 
-| Table:   Decks :belongs_to :user
+Table: decks `:belongs_to :user`
+| Column   | Type
 |----------|------------------------
 | title    | `text null: false`
 | format   | `text null: false`
@@ -73,7 +74,8 @@ Wireframe / Entity Relationship Diagram
 | public   | `boolean null: false`
 | user_id  | `reference null: false`
 
-| Table:        Cards :belongs_to :deck
+Table: cards `:belongs_to :deck`
+| Column       | Type
 |--------------|------------------------
 | card_id      | `text null: false`
 | is_commander | `boolean null: false`
