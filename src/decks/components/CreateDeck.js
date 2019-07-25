@@ -45,12 +45,11 @@ class CreateDeck extends Component {
   render () {
     // const { title, allFormats, loaded } = this.state
     const { title, err } = this.state
-    const { match } = this.props
     if (err) {
       return (
         <Fragment>
           <h3>{err.message}</h3>
-          <Link to={`/decks/${match.params.id}`}><button>Back</button></Link>
+          <Link to={'/'}><button>Back</button></Link>
         </Fragment>
       )
     }
