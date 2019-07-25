@@ -48,7 +48,7 @@ class ChooseCards extends Component {
         }
       }
       const colors = commanders.reduce((acc, c) => acc + c.color_identity.join('').toLowerCase(), '')
-      const cardsRes = await getCards(`order=cmc&q=f%3A${res.data.deck.format}+game%3Apaper${res.data.deck.format.toLowerCase() === 'commander' ? `+id%3C%3D${colors || 'c'}` : ''}`)
+      const cardsRes = await getCards(`order=cmc&q=f%3A${res.data.deck.format}+game%3Apaper${res.data.deck.format === 'commander' ? `+id%3C%3D${colors || 'c'}` : ''}`)
       this.setState({ deck: res.data.deck, cards: cardsRes.data.data, totalCards: cardsRes.data.total_cards, nextPage: cardsRes.data.next_page, colors, loaded: true })
     } catch (err) { this.setState({ err }) }
   }
@@ -65,7 +65,7 @@ class ChooseCards extends Component {
     const { deck, colors, query } = this.state
     try {
       await this.setState({ loaded: false })
-      let q = `&q=f%3A${deck.format}+game%3Apaper${deck.format.toLowerCase() === 'commander' ? `+id%3C%3D${colors || 'c'}` : ''}`
+      let q = `&q=f%3A${deck.format}+game%3Apaper${deck.format === 'commander' ? `+id%3C%3D${colors || 'c'}` : ''}`
       q += query.name ? `${query.nameInclude}${encodeURIComponent(`"${query.name}"`).replace(/%20/g, '+')}` : ''
       q += query.types ? query.types.split(' ').reduce((acc, t, i) => acc + `${i > 0 ? query.typesInclude : '%28'}${t[0] === '!' ? `-t%3A${encodeURIComponent(t.slice(1))}` : `t%3A${encodeURIComponent(t)}`}`, '') + '%29' : ''
       q += query.text ? `${query.textInclude}o%3A${encodeURIComponent(`"${query.text}"`).replace(/%20/g, '+')}` : ''

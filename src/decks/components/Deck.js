@@ -123,7 +123,7 @@ class Deck extends Component {
           </Fragment>
         )
           : null}
-        {deck.format.toLowerCase() === 'commander' ? commandersList : ''}
+        {deck.format === 'commander' ? commandersList : ''}
         <h4>Cards:</h4>
         <div className='cards-list'>
           { cardsList.length > 0 ? cardsList : <p>No cards to show</p>}
