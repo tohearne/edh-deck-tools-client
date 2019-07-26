@@ -32,7 +32,7 @@ class ChooseLands extends Component {
         }
       }
       const colors = commanders.reduce((acc, c) => acc + c.color_identity.join('').toLowerCase(), '')
-      const cardsRes = await getCards(`order=color&q=f%3A${res.data.deck.format}+game%3Apaper${res.data.deck.format === 'commander' ? `+id%3C%3D${colors || 'c'}` : ''}+t%3Abasic+t%3Aland`)
+      const cardsRes = await getCards(`order=color&q=f%3A${res.data.deck.format}+game%3Apaper${res.data.deck.format.toLowerCase() === 'commander' ? `+id%3C%3D${colors || 'c'}` : ''}+t%3Abasic+t%3Aland`)
       const values = {}
       for (let i = 0; i < cardsRes.data.data.length; i++) {
         const deckCard = res.data.deck.cards.find(c => c.card_id === cardsRes.data.data[i].id)
@@ -76,6 +76,7 @@ class ChooseLands extends Component {
       <Fragment>
         <div className='cards-list'>
           {cards.map(card => {
+            const deckCard = deck.cards.find(c => c.card_id === card.id)
             return (
               <Fragment key={card.id}>
                 <DisplayCard
@@ -85,7 +86,7 @@ class ChooseLands extends Component {
                       ? ''
                       : <CardAddForm
                         value={values[card.id]}
-                        max={deck.format === 'commander' ? 100 - deck.card_count : undefined}
+                        max={deck.format === 'commander' ? 100 - deck.card_count + (deckCard ? deckCard.amount : 0) : undefined}
                         id={card.id}
                         handleChange={this.handleChange}
                         handleSubmit={this.handleSubmit}
