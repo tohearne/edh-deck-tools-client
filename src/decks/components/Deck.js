@@ -46,7 +46,6 @@ class Deck extends Component {
       const res = await getDeck(this.props.match.params.id)
       // await this.findCards(res.data.deck.cards)
       for (let i = 0; i < res.data.deck.cards.length; i++) {
-        console.log('here')
         if (i > 0) await this.wait(50)
         this.findCard(res.data.deck.cards[i])
       }
