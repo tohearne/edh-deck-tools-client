@@ -87,6 +87,7 @@ class ChooseLands extends Component {
                       : <CardAddForm
                         value={values[card.id]}
                         max={deck.format === 'commander' ? 100 - deck.card_count + (deckCard ? deckCard.amount : 0) : undefined}
+                        min={0}
                         id={card.id}
                         handleChange={this.handleChange}
                         handleSubmit={this.handleSubmit}
