@@ -1,7 +1,21 @@
+@import './themes';
+
 body {
   font-family: sans-serif;
   margin: 0;
   padding: 0;
+}
+
+header {
+  background-color: $background-medium;
+  color: $text-light;
+}
+
+.main {
+  background-attachment: fixed;
+  background-image: url('../images/background-brown-carpentry-326311.jpg');
+  background-size: cover;
+  color: $text-light;
 }
 
 .alert {
@@ -19,8 +33,9 @@ body {
 
 .deck-prev-i,
 .card-display-i {
-  background-color: grey;
+  background-color: $background-medium;
   border-radius: 3.7%;
+  color: $text-light;
   margin: 1%;
   min-width: 15rem;
   padding: 1%;
@@ -35,4 +50,10 @@ body {
     border-radius: 3.7%;
     width: 100%;
   }
+}
+
+.deck-title,
+.deck-author {
+  color: $text-light;
+  text-decoration: none;
 }

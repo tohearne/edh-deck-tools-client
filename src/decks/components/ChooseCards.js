@@ -83,7 +83,7 @@ class ChooseCards extends Component {
     const cardId = event.target.id
     try {
       await createCard(this.state.deck.id, cardId, false, 1, this.props.user)
-      this.props.alert('Card added!', 'success')
+      // this.props.alert('Card added!', 'success')
       const res = await getDeck(this.props.match.params.id)
       this.setState({ deck: res.data.deck, cardRequests: [...this.state.cardRequests].filter(id => id !== cardId) })
     } catch (err) { this.setState({ err }) }

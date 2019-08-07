@@ -35,10 +35,21 @@ class Deck extends Component {
     return this.findCards(cards.splice(1))
   }
 
+  findCard = async card => {
+    const res = await getCard(card.card_id)
+    if (card.is_commander) await this.setState({ commanders: [...this.state.commanders, res.data], price: parseFloat((this.state.price + (res.data.prices.usd * card.amount)).toFixed(2)) })
+    else await this.setState({ cards: [...this.state.cards, res.data], price: parseFloat((this.state.price + (res.data.prices.usd * card.amount)).toFixed(2)) })
+  }
+
   async componentDidMount () {
     try {
       const res = await getDeck(this.props.match.params.id)
-      await this.findCards(res.data.deck.cards)
+      // await this.findCards(res.data.deck.cards)
+      for (let i = 0; i < res.data.deck.cards.length; i++) {
+        console.log('here')
+        if (i > 0) await this.wait(50)
+        this.findCard(res.data.deck.cards[i])
+      }
       this.setState({ deck: res.data.deck, loaded: true })
     } catch (err) { this.setState({ err }) }
   }

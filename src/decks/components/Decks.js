@@ -33,12 +33,7 @@ class Decks extends Component {
       )
     }
     if (!loaded) return <p>Loading Decks...</p>
-    const decksList = decks.map(deck => (
-      <div key={deck.id} className='deck-prev-i'>
-        <DeckPreviewImage deck={deck} />
-        <p>By: {deck.owner.name}</p>
-      </div>
-    ))
+    const decksList = decks.map(deck => (<DeckPreviewImage key={deck.id} deck={deck} other={<p className='deck-author'>By: {deck.owner.name}</p>} />))
     return (
       <div className='decks-list'>
         { decksList.length > 0 ? decksList : <p>No decks to show</p>}
